@@ -1,8 +1,6 @@
-### TODO:
-- TSC clock frequency detection based on /proc/cpuinfo
-- Conversion to kcachegrind format
-- Make it thread safe
-- Add ULT (main.cpp) RDTSC in foo vs trace.cpp RDTSC for the same function 
+# PerfTracer
+
+PerfTracer is a performance tracker eg. profiler that relies on source code instrumentation rather than performance sampling. GCC instrumentation eg. -finstrument-functions is used to inject performance counting mechanism which is rdtsc based. It is written in C++ 11 so its aplications are limited to pojects created using this programming language.
 
 ### Usage
 
@@ -11,6 +9,12 @@
 - *All traced modules should be comiled with -finstrument-functions compilation flag*
 - *Linking of binary should be against dl lib eg. -ldl*
 Example CMakeLists.txt is part of this project
+
+### TODO:
+- TSC clock frequency detection based on /proc/cpuinfo
+- Conversion to kcachegrind format
+- Make it thread safe
+- Add ULT (main.cpp) RDTSC in foo vs trace.cpp RDTSC for the same function 
 
 ### License
 Copyright (c) 2016, Jacek Czaja
