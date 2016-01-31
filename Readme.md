@@ -2,6 +2,7 @@
 - Recursive calls support!
 - TSC clock frequency detection based on /proc/cpuinfo
 - Conversion to kcachegrind format
+- License (BSD3)
 
 ### Usage
 

@@ -54,7 +54,8 @@ perftrace_stop(void)
         case -1:
           fprintf(stderr, "===> Error demangling %s\n (Memory allocation error)",info.dli_sname);
           break;
-        case -2:
+        case -2:  // C (not demangled function names) function will get here
+                  // we just make a copy of recorded name
         {
           outbuffer = reinterpret_cast<char*>(malloc(std::strlen(info.dli_sname)+1));
           std::strcpy(outbuffer,info.dli_sname);
