@@ -1,12 +1,15 @@
 #include <stdio.h>
  
-void foo() {
- printf("foo in C++\n");
+void foo(int N) {
+ printf("foo: %d in C++\n",N);
+ N/=2;
+ if(N >1 )
+  foo(N);
 }
  
 int main() {
  
- foo();
+ foo(4);
  
  return 0;
 }

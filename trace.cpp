@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
-#include <time.h>
 
 #include <map> 
 #include <dlfcn.h> //dladdr
@@ -15,9 +14,10 @@ namespace perftracer {
 
 struct profile_data
 {
-    unsigned long long start;
-    unsigned long long sum;
-    void* func;
+  unsigned long long start;
+  unsigned long long sum;
+  unsigned int nested_level;
+  void* func;
 };
 std::map<void*,profile_data> *profile_data_collector; 
 
@@ -92,9 +92,15 @@ __cyg_profile_func_enter (void *func,  void *caller)
   // If there is an entry for given function then use it
   // if not then add a new one
   if( it == perftracer::profile_data_collector->end()) {
-    perftracer::profile_data_collector->insert(std::pair<void*,perftracer::profile_data>(func,{__rdtsc(),0,func})); 
+    perftracer::profile_data_collector->insert(std::pair<void*,perftracer::profile_data>(func,{__rdtsc(),0,1,func})); 
   } else {
-    (*it).second.start = __rdtsc();
+    // For nested calls we do nothing
+    if((*it).second.nested_level == 0) {
+      (*it).second.start = __rdtsc();
+      (*it).second.nested_level = 1;
+    } else {
+      ++(*it).second.nested_level;
+    }
   }
 }
  
@@ -107,8 +113,11 @@ __cyg_profile_func_exit (void *func, void *caller)
   // There has to be entry already. If not then it is a perftracer bug!
   assert(it != perftracer::profile_data_collector->end());
   // Entry routine should 
-  (*it).second.sum += __rdtsc() - (*it).second.start;
-  (*it).second.start = 0;
+
+  if((*it).second.nested_level == 1) {
+    (*it).second.sum += __rdtsc() - (*it).second.start;
+  } 
+  --(*it).second.nested_level;
 }
 #ifdef __cplusplus
 };

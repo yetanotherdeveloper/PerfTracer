@@ -1,8 +1,9 @@
 ### TODO:
-- Recursive calls support!
 - TSC clock frequency detection based on /proc/cpuinfo
 - Conversion to kcachegrind format
 - License (BSD3)
+- Make it thread safe
+- Add ULT (main.cpp) RDTSC in foo vs trace.cpp RDTSC for the same function 
 
 ### Usage
 
