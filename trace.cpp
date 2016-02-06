@@ -4,7 +4,7 @@
 #include <cstring>
 #include <memory>
 
-#include <map> 
+#include <unordered_map> 
 #include <dlfcn.h> //dladdr
 #include <cxxabi.h>
 #include <x86intrin.h>
@@ -19,7 +19,7 @@ struct profile_data
   unsigned int nested_level;
   void* func;
 };
-std::map<void*,profile_data> *profile_data_collector; 
+std::unordered_map<void*,profile_data> *profile_data_collector; 
 
 void
 __attribute__ ((constructor))
@@ -27,9 +27,9 @@ perftrace_start(void)
 {
   fprintf(stderr, "===> Performance tracing Enabled!\n");
 
-  // We need to have map dynamically allocated as static map would
+  // We need to have unordered_map dynamically allocated as static unordered_map would
   // be destroyed before trace_end function is called
-  profile_data_collector = new std::map<void*,profile_data>;  
+  profile_data_collector = new std::unordered_map<void*,profile_data>;  
 }
  
 void
@@ -86,8 +86,10 @@ extern "C" {
 void
 __cyg_profile_func_enter (void *func,  void *caller)
 {
+
+
   // TODO: what about recursive call to given function????
-  std::map<void*,perftracer::profile_data>::iterator it;
+  std::unordered_map<void*,perftracer::profile_data>::iterator it;
   it = perftracer::profile_data_collector->find(func);
   // If there is an entry for given function then use it
   // if not then add a new one
@@ -108,7 +110,7 @@ void
 __cyg_profile_func_exit (void *func, void *caller)
 {
   Dl_info info;
-  std::map<void*,perftracer::profile_data>::iterator it;
+  std::unordered_map<void*,perftracer::profile_data>::iterator it;
   it = perftracer::profile_data_collector->find(func);
   // There has to be entry already. If not then it is a perftracer bug!
   assert(it != perftracer::profile_data_collector->end());
