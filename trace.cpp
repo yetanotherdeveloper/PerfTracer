@@ -22,17 +22,6 @@ struct profile_data
 std::unordered_map<void*,profile_data> *profile_data_collector; 
 
 void
-__attribute__ ((constructor))
-perftrace_start(void)
-{
-  fprintf(stderr, "===> Performance tracing Enabled!\n");
-
-  // We need to have unordered_map dynamically allocated as static unordered_map would
-  // be destroyed before trace_end function is called
-  profile_data_collector = new std::unordered_map<void*,profile_data>;  
-}
- 
-void
 __attribute__ ((destructor))
 perftrace_stop(void)
 {
@@ -86,7 +75,13 @@ extern "C" {
 void
 __cyg_profile_func_enter (void *func,  void *caller)
 {
-
+  // We need to have unordered_map dynamically allocated as static unordered_map would
+  // be destroyed before trace_end function is called
+  static bool initialized = false;
+  if (initialized == false) {
+    perftracer::profile_data_collector = new std::unordered_map<void*,perftracer::profile_data>;  
+    initialized = true;
+  }
 
   // TODO: what about recursive call to given function????
   std::unordered_map<void*,perftracer::profile_data>::iterator it;
